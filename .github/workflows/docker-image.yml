@@ -1,0 +1,19 @@
+name: Run Docker and tunnel using LocalTunnel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-docker:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up LocalTunnel
+      run: npm install -g localtunnel
+    - name: Build and run Docker image
+      run: |
+        docker build -t my-gsm-sniffing-image .
+        docker run -d --name my-gsm-sniffing-container my-gsm-sniffing-image
+        docker exec my-gsm-sniffing-container /bin/bash -c "gnuradio-companion"
+    - name: Tunnel using LocalTunnel
+      run: lt --port 8080 --subdomain my-gsm-sniffing-container
